@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         passwordEdit = (EditText) findViewById(R.id.password);
         getbt.setOnClickListener(this);
         postbt.setOnClickListener(this);
+
+
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -52,42 +54,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        String name = accountEdit.getText().toString();
+        String pass = passwordEdit.getText().toString();
         if (v.getId() == R.id.post) {
-
-            String name = accountEdit.getText().toString();
-            String pass = passwordEdit.getText().toString();
             JSONObject j = new JSONObject();
             try {
                 j.put("name", name);
-
                 j.put("pass", pass);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             postTest(j);
-//            OkHttpUtil.okHttpPost("http://127.0.0.1:8080/android/postTest", jsonmap, new CallBackUtil() {
-//                @Override
-//                public Object onParseResponse(Call call, Response response) {
-//                    return null;
-//                }
-//
-//                @Override
-//                public void onFailure(Call call, Exception e) {
-//
-//                }
-//
-//                @Override
-//                public void onResponse(Object response) {
-//                    Toast.makeText(MainActivity.this, "成功接收到返回值" + response.toString(), Toast.LENGTH_SHORT).show();
-//                }
-//            });
-
-
         } else if (v.getId() == R.id.get) {
-
-            getTest();
-
-
+            getTest(name);
         }
     }
 
@@ -96,13 +75,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void getTest() {
+    /**
+     * 发送get请求
+     *
+     * @param name
+     */
+    private void getTest(final String name) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.101:8080/android/getTest/123")
+                        .url("http://192.168.0.101:8080/android/getTest/" + name)
                         .build();
                 Response response = null;
                 String responseData = null;
@@ -121,18 +105,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    /**
+     * 发送POST请求
+     *
+     * @param map
+     */
     private void postTest(final JSONObject map) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();
-
-                final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+                final MediaType JSON = MediaType.parse("application/json; charset=utf-8");//发送json数据的固定写法
                 JSONObject jsonObject = new JSONObject();
 
-                RequestBody body = RequestBody.create(JSON, map.toString());
+                RequestBody body = RequestBody.create(JSON, map.toString());//这里是需要是json字符串
                 Request request = new Request.Builder()
-                        .url("http://192.168.0.101:8080/android/postTest")
+                        .url("http://192.168.0.101:8080/android/postTest")//用安卓虚拟器跑也不要用127.0.0.1
                         .post(body)
                         .build();
                 String res = null;
@@ -146,8 +134,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
             }
         }).start();
     }
