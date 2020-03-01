@@ -47,7 +47,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                Toast.makeText(MainActivity.this, "成功接收到返回值" + msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                switch (msg.what){
+                    case 1:{
+                        Toast.makeText(MainActivity.this, "Get方法成功接收到返回值" + msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                    }break;
+                    case 2:{
+                        Toast.makeText(MainActivity.this, "Post方法成功接收到返回值" + msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                    }break;
+                }
+
             }
         };
     }
@@ -97,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
                 System.out.println("成功接收到返回值" + responseData);
-                Message message = new Message();
+                Message message = handler.obtainMessage(1);
                 message.obj = responseData;
                 handler.sendMessage(message);
 
@@ -128,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Response response = client.newCall(request).execute();
                     res = response.body().string();
                     System.out.println(res);
-                    Message message = new Message();
+                    Message message = handler.obtainMessage(2);
                     message.obj = res;
                     handler.sendMessage(message);
                 } catch (IOException e) {
